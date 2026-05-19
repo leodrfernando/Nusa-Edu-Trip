@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nusa Edu Trip - LMS Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary: #0ea5e9;
+            --success: #10b981;
+            --background: #f8fafc;
+            --sidebar-bg: #0f172a;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            display: flex;
+            background-color: var(--background);
+            color: var(--text-main);
+        }
+
+        /* --- SIDEBAR LMS --- */
+        .sidebar {
+            width: 280px;
+            height: 100vh;
+            background-color: var(--sidebar-bg);
+            color: white;
+            position: fixed;
+            overflow-y: auto;
+            padding: 24px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar .logo-area {
+            padding: 0 24px 24px 24px;
+            border-bottom: 1px solid #1e293b;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .sidebar h2 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0 12px;
+        }
+
+        .sidebar ul li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: #94a3b8;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-bottom: 4px;
+        }
+
+        .sidebar ul li a:hover, .sidebar ul li a.active {
+            background-color: #1e293b;
+            color: white;
+        }
+        
+        .sidebar ul li a.active {
+            background-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        }
+
+        .sidebar ul li a .icon {
+            margin-right: 12px;
+            font-size: 16px;
+        }
+
+        /* --- AREA UTAMA --- */
+        .main-content {
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            padding: 40px 50px;
+            min-height: 100vh;
+        }
+
+        /* --- PROGRES BELAJAR --- */
+        .progress-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .progress-info h3 { font-size: 15px; font-weight: 600; }
+        .progress-info p { font-size: 13px; color: var(--text-muted); }
+        .progress-bar-container { width: 45%; }
+        .progress-text-wrapper { display: flex; justify-content: flex-end; font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
+        .progress-bar-bg { background-color: #f1f5f9; border-radius: 10px; height: 8px; width: 100%; overflow: hidden; }
+        .progress-bar-fill { background: linear-gradient(90deg, var(--primary), var(--secondary)); height: 100%; width: 0%; transition: width 0.4s ease; }
+
+        /* --- HEADER FOTO --- */
+        .header-image-container {
+            width: 100%;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        .header-image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* --- KARTU KONTEN --- */
+        .content-section {
+            display: none;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .content-section.active { display: block; }
+        h1 { font-size: 26px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+        .sub-p { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; line-height: 1.6; }
+        .section-subtitle { font-size: 15px; font-weight: 600; color: var(--primary); margin: 20px 0 8px 0; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px; }
+        
+        .materi-list { list-style: none; margin-bottom: 16px; }
+        .materi-list li { position: relative; padding-left: 20px; margin-bottom: 6px; line-height: 1.6; color: #475569; font-size: 14px; }
+        .materi-list li::before { content: "•"; color: var(--secondary); font-weight: bold; position: absolute; left: 5px; }
+
+        /* --- STRUKTUR RESOURCE & MEDIA --- */
+        .resources-box { margin-top: 30px; background-color: #f8fafc; padding: 24px; border-radius: 12px; border: 1px dashed #cbd5e1; }
+        .resources-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 700; margin-bottom: 16px; }
+        .resources-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .resource-card { background: white; border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
+        .resource-card.canva-card { border-top: 4px solid #00c4cc; }
+        .resource-card.youtube-card { border-top: 4px solid #ff0000; }
+        .resource-card.quiz-card { border-top: 4px solid #9c27b0; }
+        .resource-card.game-card { border-top: 4px solid #10b981; grid-column: span 2; }
+        
+        .card-badge { font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-bottom: 10px; }
+        .canva-card .card-badge { background: #e6f9fa; color: #00878c; }
+        .youtube-card .card-badge { background: #ffebeb; color: #cc0000; }
+        .quiz-card .card-badge { background: #f3e5f5; color: #7b1fa2; }
+        .game-card .card-badge { background: #e8f5e9; color: #2e7d32; }
+
+        .card-name { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+        .card-text { font-size: 13px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5; }
+        
+        .btn-action { display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; color: white; transition: opacity 0.2s; text-align: center; }
+        .btn-action:hover { opacity: 0.9; }
+        .canva-card .btn-action { background: #00c4cc; }
+        .youtube-card .btn-action { background: #ff0000; }
+        .quiz-card .btn-action { background: #9c27b0; }
+        .game-card .btn-action { background: #10b981; }
+
+        .video-wrapper { margin-top: 10px; position: relative; padding-bottom: 56.25%; height: 0; border-radius: 6px; overflow: hidden; border: 1px solid var(--border-color); }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+        .footer-action { margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; }
+        .btn-done { background-color: var(--success); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; transition: background 0.2s; }
+        .btn-done:hover { background-color: #059669; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="logo-area">
+            <h2>NUSA EDU TRIP</h2>
+        </div>
+        <ul>
+            <li><a href="#" class="active" onclick="showModule('jabar', this)"><span class="icon">🗻</span> 1. Jawa Barat</a></li>
+            <li><a href="#" onclick="showModule('jateng', this)"><span class="icon">🏛️</span> 2. Jawa Tengah</a></li>
+            <li><a href="#" onclick="showModule('jatim', this)"><span class="icon">🐅</span> 3. Jawa Timur</a></li>
+            <li><a href="#" onclick="showModule('banten', this)"><span class="icon">🌊</span> 4. Banten</a></li>
+            <li><a href="#" onclick="showModule('jakarta', this)"><span class="icon">🏙️</span> 5. DKI Jakarta</a></li>
+            <li><a href="#" onclick="showModule('jogja', this)"><span class="icon">🏯</span> 6. Yogyakarta</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        
+        <div class="progress-card">
+            <div class="progress-info">
+                <h3>Progres Belajar Kebudayaan</h3>
+                <p>Klik tombol penyelesaian di setiap modul untuk memperbarui grafik progres Anda.</p>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-text-wrapper">
+                    <span id="percentText">0% Selesai</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-image-container">
+            <img src="https://i.ibb.co/rf4xXk2k/Whats-App-Image-2026-05-19-at-21-32-07.jpg" alt="Banner Nusa Edu Trip">
+        </div>
+
+        <div id="jabar" class="content-section active">
+            <h1>1. Jawa Barat</h1>
+            <p class="sub-p">Jawa Barat adalah salah satu provinsi di Pulau Jawa yang memiliki ibu kota di Bandung. Jawa Barat dikenal dengan budaya Sunda yang ramah dan kaya tradisi.</p>
+            
+            <div class="section-subtitle">Letak Geografis</div>
+            <ul class="materi-list">
+                <li>Jawa Barat terletak di bagian barat Pulau Jawa.</li>
+                <li>Batas Wilayah: Utara (Laut Jawa), Selatan (Samudra Hindia), Barat (Banten dan DKI Jakarta), Timur (Jawa Tengah).</li>
+                <li>Wilayah Jawa Barat memiliki pegunungan, dataran tinggi, dan banyak sungai.</li>
+            </ul>
+
+            <div class="section-subtitle">Pakaian Adat</div>
+            <ul class="materi-list">
+                <li>Pakaian adat Jawa Barat dikenal dengan nama Kebaya Sunda.</li>
+                <li>Perempuan biasanya memakai kebaya, kain batik, dan selendang.</li>
+                <li>Laki-laki memakai baju pangsi atau jas tutup dengan ikat kepala.</li>
+                <li>Pakaian ini melambangkan kesopanan dan kelembutan masyarakat Sunda.</li>
+            </ul>
+
+            <div class="section-subtitle">Makanan Khas</div>
+            <ul class="materi-list">
+                <li>Beberapa makanan khas Jawa Barat antara lain: Seblak, Batagor, Karedok, dan Surabi.</li>
+                <li>Makanan khas Sunda terkenal memiliki rasa segar dan gurih.</li>
+            </ul>
+
+            <div class="section-subtitle">Lagu Daerah & Kesenian</div>
+            <ul class="materi-list">
+                <li>Contoh lagu daerah Jawa Barat: Manuk Dadali, Tokecang, dan Bubuy Bulan.</li>
+                <li>Kesenian Daerah: Angklung, Wayang Golek, Jaipong, dan Kecapi Suling.</li>
+                <li>Angklung merupakan alat musik tradisional yang diakui UNESCO sebagai warisan budaya dunia.</li>
+            </ul>
+
+            <p class="sub-p" style="font-style: italic; margin-top: 10px;">Kesimpulan: Jawa Barat merupakan provinsi yang kaya budaya Sunda, memiliki alam yang indah, serta berbagai kesenian dan makanan khas yang terkenal di Indonesia.</p>
+
+            <div class="resources-box">
+                <div class="resources-title">📁 Media Interaktif & Evaluasi</div>
+                <div class="resources-grid">
+                    <div class="resource-card canva-card">
+                        <div>
+                            <span class="card-badge">Canva Link</span>
+                            <div class="card-name">Materi Canva Jawa Barat</div>
+                            <div class="card-text">Akses infografis rangkuman materi visual budaya Jawa Barat melalui tautan di bawah ini.</div>
+                        </div>
+                        <a href="https://canva.link/viispr83fh91b8g" target="_blank" class="btn-action">Buka Materi Canva</a>
+                    </div>
+                    <div class="resource-card quiz-card">
+                        <div>
+                            <span class="card-badge">Google Forms</span>
+                            <div class="card-name">Kuis Penguji Jawa Barat</div>
+                            <div class="card-text">Uji tingkat pemahaman Anda mengenai ragam adat Sunda melalui kuis daring resmi.</div>
+                        </div>
+                        <a href="https://forms.gle/96p4ELk2MmP92WYWA" target="_blank" class="btn-action">Mulai Kuis</a>
+                    </div>
+                    <div class="resource-card youtube-card" style="grid-column: span 2;">
+                        <div>
+                            <span class="card-badge">Video Pembelajaran</span>
+                            <div class="card-name">Dokumenter Budaya Jawa Barat</div>
+                            <div class="card-text">Putar video edukasi kebudayaan berikut langsung pada dashboard:</div>
+                            <div class="video-wrapper">
+                                <iframe src="https://www.youtube.com/embed/a4oARp-lPVw" frameborder="0" allowfullscreen></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-action">
+                <button class="btn-done" onclick="completeModule('jabar')">Selesai Membaca Modul ✓</button>
+            </div>
+        </div>
+
+        <div id="jateng" class="content-section">
+            <h1>2. Jawa Tengah</h1>
+            <p class="sub-p">Jawa Tengah adalah salah satu provinsi di Pulau Jawa yang terletak di bagian tengah Pulau Jawa. Ibu kotanya adalah Semarang. Jawa Tengah dikenal sebagai pusat budaya Jawa yang masih sangat kental.</p>
+            
+            <div class="section-subtitle">Letak Geografis</div>
+            <ul class="materi-list">
+                <li>Sebelah utara: Laut Jawa | Sebelah selatan: Samudra Hindia | Sebelah barat: Jawa Barat | Sebelah timur: Jawa Timur.</li>
+                <li>Provinsi ini memiliki dataran rendah, pegunungan, serta banyak gunung berapi seperti Gunung Merapi.</li>
+            </ul>
+
+            <div class="section-subtitle">Budaya & Tata Krama</div>
+            <ul class="materi-list">
+                <li>Budaya masyarakat Jawa Tengah terkenal sopan dan menjunjung tinggi tata krama.</li>
+                <li>Bahasa daerah yang digunakan adalah Bahasa Jawa dengan berbagai tingkatan bahasa, seperti ngoko dan krama.</li>
+                <li>Kesenian Daerah: Wayang kulit, Tari Gambyong, Ketoprak, dan Gamelan.</li>
+            </ul>
+
+            <div class="section-subtitle">Rumah Adat & Pakaian Adat</div>
+            <ul class="materi-list">
+                <li>Rumah adat Jawa Tengah adalah Rumah Joglo. Memiliki atap khas berbentuk tinggi dan biasanya digunakan oleh keluarga bangsawan.</li>
+                <li>Pakaian adat Jawa Tengah antara lain: Kebaya, Beskap, dan Batik. Batik dari Jawa Tengah terkenal hingga mancanegara (Solo & Pekalongan).</li>
+            </ul>
+
+            <div class="section-subtitle">Makanan Khas & Lagu Daerah</div>
+            <ul class="materi-list">
+                <li>Beberapa makanan khas Jawa Tengah: Gudeg, Lumpia Semarang, Soto Kudus, dan Nasi Liwet (dominan rasa manis dan gurih).</li>
+                <li>Contoh lagu daerah Jawa Tengah: Gundul-Gundul Pacul, Suwe Ora Jamu, dan Gambang Suling.</li>
+                <li>Tempat Wisata: Candi Borobudur, Dieng Plateau, dan Keraton Surakarta.</li>
+            </ul>
+
+            <p class="sub-p" style="font-style: italic; margin-top: 10px;">Kesimpulan: Jawa Tengah merupakan provinsi yang kaya akan budaya, sejarah, dan tradisi. Keindahan alam serta keramahan masyarakatnya menjadikan Jawa Tengah sebagai salah satu daerah penting di Indonesia.</p>
+
+            <div class="resources-box">
+                <div class="resources-title">📁 Media Interaktif & Evaluasi</div>
+                <div class="resources-grid">
+                    <div class="resource-card canva-card">
+                        <div>
+                            <span class="card-badge">Canva Link</span>
+                            <div class="card-name">Materi Canva Jawa Tengah</div>
+                            <div class="card-text">Akses rangkuman grafis arsitektur Joglo dan batik Jawa Tengah lewat tautan ini.</div>
+                        </div>
+                        <a href="https://canva.link/9y9ie7xxqu2wjz3" target="_blank" class="btn-action">Buka Canva</a>
+                    </div>
+                    <div class="resource-card quiz-card">
+                        <div>
+                            <span class="card-badge">Google Forms</span>
+                            <div class="card-name">Kuis Penguji Jawa Tengah</div>
+                            <div class="card-text">Uji penguasaan wawasan tradisi Surakarta dan Semarang melalui instrumen kuis.</div>
+                        </div>
+                        <a href="https://forms.gle/DDCtMVPAEyAjqLkN7" target="_blank" class="btn-action">Mulai Kuis</a>
+                    </div>
+                    <div class="resource-card youtube-card" style="grid-column: span 2;">
+                        <div>
+                            <span class="card-badge">Video Pembelajaran</span>
+                            <div class="card-name">Dokumenter Budaya Jawa Tengah</div>
+                            <div class="card-text">Tonton video paparan instuktif seputar tradisi Jawa Tengah di bawah ini:</div>
+                            <div class="video-wrapper">
+                                <iframe src="https://www.youtube.com/embed/-AbRLLWniWU" frameborder="0" allowfullscreen></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-action">
+                <button class="btn-done" onclick="completeModule('jateng')">Selesai Membaca Modul ✓</button>
+            </div>
+        </div>
+
+        <div id="jatim" class="content-section">
+            <h1>3. Jawa Timur</h1>
+            <p class="sub-p">Jawa Timur adalah salah satu provinsi di bagian timur Pulau Jawa. Ibu kotanya adalah Surabaya yang dikenal sebagai Kota Pahlawan.</p>
+            
+            <div class="section-subtitle">Letak Geografis</div>
+            <ul class="materi-list">
+                <li>Jawa Timur memiliki wilayah yang luas dengan pegunungan, pantai, dan dataran rendah.</li>
+                <li>Batas Wilayah: Utara (Laut Jawa), Selatan (Samudra Hindia), Barat (Jawa Tengah), Timur (Selat Bali). Memiliki beberapa pulau seperti Madura dan Bawean.</li>
+            </ul>
+
+            <div class="section-subtitle">Budaya & Kesenian</div>
+            <ul class="materi-list">
+                <li>Budaya Jawa Timur sangat beragam karena dipengaruhi budaya Jawa, Madura, dan Osing.</li>
+                <li>Kesenian Daerah: Reog Ponorogo, Ludruk, Tari Remo, dan Jaranan. Reog Ponorogo menggunakan topeng besar berbentuk kepala singa.</li>
+            </ul>
+
+            <div class="section-subtitle">Rumah Adat & Pakaian Adat</div>
+            <ul class="materi-list">
+                <li>Rumah adat Jawa Timur dikenal dengan nama Rumah Joglo Situbondo dan rumah tradisional khas Madura.</li>
+                <li>Pakaian Adat: Baju Pesa’an Madura, Kebaya Jawa Timur, dan Udeng khas daerah tertentu.</li>
+            </ul>
+
+            <div class="section-subtitle">Makanan Khas & Wisata</div>
+            <ul class="materi-list">
+                <li>Beberapa makanan khas Jawa Timur: Rawon, Rujak Cingur, Soto Lamongan, dan Pecel Madiun (terkenal dengan rasa kuat dan pedas).</li>
+                <li>Contoh lagu daerah: Rek Ayo Rek, Cublak-Cublak Suweng, dan Tanduk Majeng.</li>
+                <li>Tempat Wisata Terkenal: Gunung Bromo, Jatim Park, Kawah Ijen, dan Pantai Balekambang.</li>
+            </ul>
+
+            <p class="sub-p" style="font-style: italic; margin-top: 10px;">Kesimpulan: Jawa Timur merupakan provinsi yang kaya budaya, memiliki sejarah perjuangan bangsa, serta terkenal dengan wisata alam dan kesenian tradisionalnya.</p>
+
+            <div class="resources-box">
+                <div class="resources-title">📁 Media Interaktif & Evaluasi</div>
+                <div class="resources-grid">
+                    <div class="resource-card canva-card">
+                        <div>
+                            <span class="card-badge">Canva Link</span>
+                            <div class="card-name">Materi Canva Jawa Timur</div>
+                            <div class="card-text">Lihat kompilasi visual pakaian adat Pesa'an Madura dan kesenian Remo via Canva.</div>
+                        </div>
+                        <a href="https://canva.link/39fbair134kpyy9" target="_blank" class="btn-action">Buka Canva</a>
+                    </div>
+                    <div class="resource-card quiz-card">
+                        <div>
+                            <span class="card-badge">Google Forms</span>
+                            <div class="card-name">Kuis Penguji Jawa Timur</div>
+                            <div class="card-text">Akses evaluasi kuis mandiri kebudayaan Jawa Timur melalui instrumen kuis daring.</div>
+                        </div>
+                        <a href="https://forms.gle/XdxnnooEacXx4Gk97" target="_blank" class="btn-action">Mulai Kuis</a>
+                    </div>
+                    <div class="resource-card youtube-card" style="grid-column: span 2;">
+                        <div>
+                            <span class="card-badge">Video Pembelajaran</span>
+                            <div class="card-name">Dokumenter Budaya Jawa Timur</div>
+                            <div class="card-text">Simak ulasan audio-visual mengenai kebudayaan Jawa Timur berikut:</div>
+                            <div class="video-wrapper">
+                                <iframe src="https://www.youtube.com/embed/cYSrmTZjJfg" frameborder="0" allowfullscreen></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-action">
+                <button class="btn-done" onclick="completeModule('jatim')">Selesai Membaca Modul ✓</button>
+            </div>
+        </div>
+
+        <div id="banten" class="content-section">
+            <h1>4. Banten</h1>
+            <p class="sub-p">Banten adalah salah satu provinsi di bagian barat Pulau Jawa. Ibu kotanya adalah Serang. Banten dikenal sebagai daerah yang memiliki sejarah penting dalam penyebaran agama Islam di Indonesia.</p>
+            
+            <div class="section-subtitle">Letak Geografis</div>
+            <ul class="materi-list">
+                <li>Banten terletak di ujung barat Pulau Jawa.</li>
+                <li>Batas Wilayah: Utara (Laut Jawa), Selatan (Samudra Hindia), Barat (Selat Sunda), Timur (DKI Jakarta dan Jawa Barat).</li>
+            </ul>
+
+            <div class="section-subtitle">Budaya & Kesenian</div>
+            <ul class="materi-list">
+                <li>Masyarakat Banten memiliki budaya yang dipengaruhi oleh budaya Sunda dan Islam.</li>
+                <li>Bahasa daerah: Bahasa Sunda dan Bahasa Jawa Serang.</li>
+                <li>Kesenian Daerah: Debus, Rampak Bedug, Patingtung, dan Tari Walijamaliha. Debus menunjukkan kekebalan tubuh dan keberanian.</li>
+            </ul>
+
+            <div class="section-subtitle">Rumah, Pakaian, & Makanan Khas</div>
+            <ul class="materi-list">
+                <li>Rumah adat Banten dikenal dengan nama Rumah Baduy yang sederhana dan terbuat dari bahan alam.</li>
+                <li>Pakaian adat berupa Baju Pangsi dan Ikat kepala khas Sunda Banten. Pakaian umumnya identik dengan warna hitam atau putih sederhana. Perempuan memakai kebaya putih dan kain batik Banten.</li>
+                <li>Beberapa makanan khas Banten: Sate Bandeng, Rabeg, Angeun Lada, dan Kue Jojorong.</li>
+                <li>Lagu daerah: Dayung Sampan dan Tong Sarakah.</li>
+                <li>Tempat Wisata: Taman Nasional Ujung Kulon, Pantai Anyer, Masjid Agung Banten, dan Suku Baduy.</li>
+            </ul>
+
+            <p class="sub-p" style="font-style: italic; margin-top: 10px;">Kesimpulan: Banten merupakan provinsi yang kaya akan sejarah, budaya Islam, dan keindahan alam. Tradisi masyarakatnya masih terjaga dengan baik hingga sekarang.</p>
+
+            <div class="resources-box">
+                <div class="resources-title">📁 Media Interaktif & Evaluasi</div>
+                <div class="resources-grid">
+                    <div class="resource-card canva-card">
+                        <div>
+                            <span class="card-badge">Canva Link</span>
+                            <div class="card-name">Materi Canva Banten</div>
+                            <div class="card-text">Buka berkas media pendukung visual kebudayaan Banten melalui tautan Canva.</div>
+                        </div>
+                        <a href="https://canva.link/zxlxqx82yrgkymn" target="_blank" class="btn-action">Buka Canva</a>
+                    </div>
+                    <div class="resource-card quiz-card">
+                        <div>
+                            <span class="card-badge">Google Forms</span>
+                            <div class="card-name">Kuis Penguji Banten</div>
+                            <div class="card-text">Akses penilaian materi esai/pilihan ganda kuis Banten secara langsung.</div>
+                        </div>
+                        <a href="https://forms.gle/shDFihpJwBV7DY5i7" target="_blank" class="btn-action">Mulai Kuis</a>
+                    </div>
+                    <div class="resource-card youtube-card" style="grid-column: span 2;">
+                        <div>
+                            <span class="card-badge">Video Pembelajaran</span>
+                            <div class="card-name">Dokumenter Budaya Banten</div>
+                            <div class="card-text">Putar video klip materi kesenian Debus dan ragam sejarah Kesultanan Banten:</div>
+                            <div class="video-wrapper">
+                                <iframe src="https://www.youtube.com/embed/fvp2Ak6nA48" frameborder="0" allowfullscreen></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-action">
+                <button class="btn-done" onclick="completeModule('banten')">Selesai Membaca Modul ✓</button>
+            </div>
+        </div>
+
+        <div id="jakarta" class="content-section">
+            <h1>5. DKI Jakarta</h1>
+            <p class="sub-p">Jakarta adalah ibu kota negara Indonesia sekaligus pusat pemerintahan, ekonomi, dan bisnis nasional. Nama DKI merupakan singkatan dari Daerah Khusus Ibukota.</p>
+            
+            <div class="section-subtitle">Letak Geografis & Penduduk</div>
+            <ul class="materi-list">
+                <li>DKI Jakarta terletak di bagian barat laut Pulau Jawa.</li>
+                <li>Batas Wilayah: Utara (Laut Jawa), Selatan (Jawa Barat), Barat (Banten), Timur (Jawa Barat). Memiliki kepulauan yang dikenal sebagai Kepulauan Seribu.</li>
+                <li>Jakarta memiliki masyarakat yang sangat majemuk. Bahasa yang sering digunakan adalah Bahasa Indonesia, Bahasa Betawi, dan bahasa daerah lainnya.</li>
+            </ul>
+
+            <div class="section-subtitle">Budaya Betawi & Kesenian</div>
+            <ul class="materi-list">
+                <li>Budaya asli Jakarta adalah budaya Betawi.</li>
+                <li>Kesenian Daerah: Ondel-ondel, Tari Yapong, Lenong, dan Gambang Kromong.</li>
+                <li>Rumah adat Jakarta adalah Rumah Kebaya yang memiliki bentuk atap menyerupai lipatan kebaya.</li>
+                <li>Pakaian Adat: Baju Sadariah untuk laki-laki (dan peci), serta Kebaya Encim untuk perempuan.</li>
+            </ul>
+
+            <div class="section-subtitle">Makanan Khas & Wisata</div>
+            <ul class="materi-list">
+                <li>Beberapa makanan khas DKI Jakarta: Kerak Telor, Soto Betawi, Asinan Betawi, dan Roti Buaya.</li>
+                <li>Contoh lagu daerah: Kicir-Kicir, Jali-Jali, dan Ondel-Ondel.</li>
+                <li>Tempat Wisata Terkenal: Monumen Nasional (Monas), Taman Mini Indonesia Indah (TMII), Ancol Dreamland, dan Kota Tua Jakarta.</li>
+            </ul>
+
+            <p class="sub-p" style="font-style: italic; margin-top: 10px;">Kesimpulan: DKI Jakarta merupakan pusat kegiatan nasional Indonesia yang memiliki masyarakat majemuk, budaya Betawi yang unik, serta berbagai tempat wisata dan bangunan penting bagi negara.</p>
+
+            <div class="resources-box">
+                <div class="resources-title">📁 Media Interaktif & Evaluasi</div>
+                <div class="resources-grid">
+                    <div class="resource-card canva-card">
+                        <div>
+                            <span class="card-badge">Canva Link</span>
+                            <div class="card-name">Materi Canva DKI Jakarta</div>
+                            <div class="card-text">Lihat ringkasan infografis seni ornamen Rumah Kebaya dan ikon Monas di Canva.</div>
+                        </div>
+                        <a href="https://canva.link/vpm3o2f52h7lb0m" target="_blank" class="btn-action">Buka Canva</a>
+                    </div>
+                    <div class="resource-card quiz-card">
+                        <div>
+                            <span class="card-badge">Google Forms</span>
+                            <div class="card-name">Kuis Penguji DKI Jakarta</div>
+                            <div class="card-text">Selesaikan evaluasi kuis interaktif mengenai kebudayaan Betawi melalui tautan berikut.</div>
+                        </div>
+                        <a href="https://forms.gle/vQPx8SURcyWLv6mr8" target="_blank" class="btn-action">Mulai Kuis</a>
+                    </div>
+                    <div class="resource-card youtube-card" style="grid-column: span 2;">
+                        <div>
+                            <span class="card-badge">Video Pembelajaran</span>
+                            <div class="card-name">Dokumenter Budaya DKI Jakarta</div>
+                            <div class="card-text">Simak penayangan video dokumentasi pelestarian seni budaya Jakarta berikut:</div>
+                            <div class="video-wrapper">
+                                <iframe src="https://www.youtube.com/embed/RX3h3qzobkU" frameborder="0" allowfullscreen></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-action">
+                <button class="btn-done" onclick="completeModule('jakarta')">Selesai Membaca Modul ✓</button>
+            </div>
+        </div>
+
+        <div id="jogja" class="content-section">
+            <h1>6. Yogyakarta</h1>
+            <p class="sub-p">Yogyakarta adalah salah satu daerah istimewa di Indonesia yang terkenal sebagai kota budaya, pendidikan, dan pariwisata. Yogyakarta sering disebut sebagai “Kota Pelajar” karena memiliki banyak sekolah dan perguruan tinggi.</p>
+            
+            <div class="section-subtitle">Letak Geografis</div>
+            <ul class="materi-list">
+                <li>Yogyakarta terletak di bagian selatan Pulau Jawa dan berbatasan langsung dengan Samudra Hindia di sebelah selatan.</li>
+                <li>Daerah ini memiliki wilayah berupa pegunungan, dataran rendah, dan pantai.</li>
+            </ul>
+
+            <div class="section-subtitle">Budaya & Tradisi Keraton</div>
+            <ul class="materi-list">
+                <li>Budaya Yogyakarta sangat kental dengan tradisi Jawa. Beberapa budaya yang terkenal antara lain: Batik Yogyakarta, Wayang kulit, Tari tradisional Jawa, serta Upacara adat seperti Sekaten dan Grebeg.</li>
+                <li>Keraton Yogyakarta menjadi pusat budaya dan simbol pemerintahan tradisional di Yogyakarta.</li>
+                <li>Pakaian adat terkenal anggun dan berasal dari budaya keraton. Laki-laki memakai beskap dan blangkon, perempuan memakai kebaya dan kain batik.</li>
+            </ul>
+
+            <div class="section-subtitle">Tempat Wisata & Kuliner Khas</div>
+            <ul class="materi-list">
+                <li>Yogyakarta memiliki banyak tempat wisata terkenal, seperti: Malioboro, Candi Prambanan, Pantai Parangtritis, dan Taman Sari.</li>
+                <li>Makanan khas Yogyakarta yang terkenal adalah: Gudeg, Bakpia, Geplak, dan Sate Klathak.</li>
+                <li>Contoh lagu daerah: Suwe Ora Jamu, Gugur Gunung, dan Pitik Tukung.</li>
+            </ul>
+
+            <p class="sub-p" style="font-style: italic; margin-top: 10px;">Kesimpulan: Yogyakarta merupakan daerah yang kaya akan budaya, pendidikan, dan wisata. Keistimewaan budaya serta keramahan masyarakat menjadikan Yogyakarta salah satu daerah yang paling dikenal di Indonesia.</p>
+
+            <div class="resources-box">
+                <div class="resources-title">📁 Media Interaktif & Evaluasi</div>
+                <div class="resources-grid">
+                    <div class="resource-card canva-card">
+                        <div>
+                            <span class="card-badge">Canva Link</span>
+                            <div class="card-name">Materi Canva Yogyakarta</div>
+                            <div class="card-text">Pelajari esensi filosofi adat Sekaten dan tradisi membatik Keraton lewat Canva.</div>
+                        </div>
+                        <a href="https://canva.link/2l4hw8lug95kjn8" target="_blank" class="btn-action">Buka Canva</a>
+                    </div>
+                    <div class="resource-card quiz-card">
+                        <div>
+                            <span class="card-badge">Google Forms</span>
+                            <div class="card-name">Kuis Penguji Yogyakarta</div>
+                            <div class="card-text">Kerjakan kuis pemahaman komprehensif seputar Daerah Istimewa Yogyakarta.</div>
+                        </div>
+                        <a href="https://forms.gle/a2cvganL2AyaGhEE7" target="_blank" class="btn-action">Mulai Kuis</a>
+                    </div>
+                    <div class="resource-card youtube-card" style="grid-column: span 2;">
+                        <div>
+                            <span class="card-badge">Video Pembelajaran</span>
+                            <div class="card-name">Dokumenter Budaya Yogyakarta</div>
+                            <div class="card-text">Putar video rangkuman kearifan lokal Daerah Istimewa Yogyakarta:</div>
+                            <div class="video-wrapper">
+                                <iframe src="https://www.youtube.com/embed/lCROkc2nYvM" frameborder="0" allowfullscreen></iframe>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="resource-card game-card">
+                        <div>
+                            <span class="card-badge">Interactive Game</span>
+                            <div class="card-name">Game Edukasi Nusa EduTrip</div>
+                            <div class="card-text">Selesaikan seluruh rangkaian pembelajaran kebudayaan dengan memainkan game interaktif yang seru di bawah ini!</div>
+                        </div>
+                        <a href="https://gemini.google.com/share/4a4bf5834a20" target="_blank" class="btn-action">Mainkan Game Sekarang 🎮</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-action">
+                <button class="btn-done" onclick="completeModule('jogja')">Selesai Membaca Modul ✓</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const completedModules = new Set();
+        const totalModules = 6;
+
+        function showModule(moduleId, element) {
+            // Sembunyikan semua section materi
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(sec => sec.classList.remove('active'));
+
+            // Tampilkan section yang dipilih
+            document.getElementById(moduleId).classList.add('active');
+
+            // Atur menu aktif di sidebar
+            const links = document.querySelectorAll('.sidebar ul li a');
+            links.forEach(link => link.classList.remove('active'));
+            element.classList.add('active');
+
+            // Gulir otomatis kembali ke atas
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function completeModule(moduleId) {
+            if (!completedModules.has(moduleId)) {
+                completedModules.add(moduleId);
+                
+                // Hitung persentase progres
+                const percentage = Math.round((completedModules.size / totalModules) * 100);
+                
+                // Perbarui tampilan progress bar
+                document.getElementById('progressFill').style.width = percentage + '%';
+                document.getElementById('percentText').innerText = percentage + '% Selesai';
+                
+                alert("Bagus! Modul ini telah ditandai selesai. Progres belajar Anda meningkat!");
+            } else {
+                alert("Modul ini sudah diselesaikan sebelumnya.");
+            }
+        }
+    </script>
+</body>
+</html>
